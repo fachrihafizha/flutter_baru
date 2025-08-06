@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fachri/models/post_model.dart';
-import 'package:flutter_fachri/servis/post_service.dart';
+import 'package:flutter_fachri/services/post_service.dart';
 
 class ListPostScreen extends StatelessWidget {
   const ListPostScreen({super.key});
