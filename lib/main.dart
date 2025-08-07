@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'services/auth_service.dart';
-import 'pages/auth/login_screen.dart';
-import 'pages/home_screen.dart';
+import 'package:flutter_fachri/pages/auth/login_screen.dart';
+import 'package:flutter_fachri/pages/menu_screen.dart';
+import 'package:flutter_fachri/services/auth_service.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -13,10 +13,48 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login Register App',
-      theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: AuthService.isLoggedIn() ? const HomeScreen() : const LoginScreen(),
+      title: 'Belajar Flutter',
+      home: AuthCheck(),
     );
   }
 }
+
+class AuthCheck extends StatefulWidget {
+  const AuthCheck({super.key});
+
+  @override
+  State<AuthCheck> createState() => _AuthCheckState();
+}
+
+class _AuthCheckState extends State<AuthCheck> {
+  final AuthService _authService = AuthService();
+  late Future<bool> _isLoggedIn;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoggedIn = _authService.isLoggedIn();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _isLoggedIn,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasData && snapshot.data == true) {
+          return MenuScreen();
+        } else {
+          return LoginScreen();
+        }
+      },
+    );
+  }
+}
+
+
+

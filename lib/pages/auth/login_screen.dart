@@ -1,74 +1,67 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
-import '../home_screen.dart';
-import 'register_screen.dart';
+import 'package:flutter_fachri/pages/auth/register_screen.dart';
+import 'package:flutter_fachri/pages/menu_screen.dart';
+import 'package:flutter_fachri/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
-
-  Future<void> _login() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    final success = await AuthService.login(
-      _usernameController.text,
-      _passwordController.text,
-    );
-
-    if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } else {
-      setState(() {
-        _error = 'Login gagal. Coba lagi!';
-        _isLoading = false;
-      });
-    }
-  }
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('Login Page')),
+        body: Container(
+          color: Colors.blue,
+          padding: EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Login", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              TextField(controller: _usernameController, decoration: const InputDecoration(labelText: 'Username')),
-              const SizedBox(height: 12),
-              TextField(controller: _passwordController, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              ],
-              const SizedBox(height: 24),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
               ElevatedButton(
-                onPressed: _isLoading ? null : _login,
-                child: _isLoading ? const CircularProgressIndicator() : const Text("Login"),
+                onPressed: () async {
+                  bool success = await _authService.login(
+                    password: passwordController.text,
+                    email: emailController.text,
+                  );
+                  if (success) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => MenuScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('Login Gagal')));
+                  }
+                },
+                child: Text('Login'),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => RegisterScreen()),
+                  );
                 },
-                child: const Text("Belum punya akun? Register"),
-              )
+                child: Text('Belum punya akun? Daftar di sini'),
+              ),
             ],
           ),
         ),

@@ -1,11 +1,22 @@
 class UserModel {
-  final String username;
+  final int id;
+  final String name;
   final String email;
-  final String? password;
+  final String createdAt;
 
   UserModel({
-    required this.username,
+    required this.id,
+    required this.name,
     required this.email,
-    this.password,
+    required this.createdAt,
   });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      createdAt: json['created_at'],
+    );
+  }
 }

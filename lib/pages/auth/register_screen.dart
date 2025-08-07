@@ -1,70 +1,69 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
-import '../home_screen.dart';
+import 'package:flutter_fachri/pages/auth/login_screen.dart';
+import 'package:flutter_fachri/pages/home_screen.dart';
+import 'package:flutter_fachri/services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
-
-  Future<void> _register() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    final success = await AuthService.register(
-      _usernameController.text,
-      _emailController.text,
-      _passwordController.text,
-    );
-
-    if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } else {
-      setState(() {
-        _error = 'Gagal register. Coba lagi!';
-        _isLoading = false;
-      });
-    }
-  }
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('Register Page')),
+        body: Container(
+          color: Colors.lightBlueAccent,
+          padding: EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Register", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              TextField(controller: _usernameController, decoration: const InputDecoration(labelText: 'Username')),
-              const SizedBox(height: 12),
-              TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email')),
-              const SizedBox(height: 12),
-              TextField(controller: _passwordController, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              ],
-              const SizedBox(height: 24),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
               ElevatedButton(
-                onPressed: _isLoading ? null : _register,
-                child: _isLoading ? const CircularProgressIndicator() : const Text("Register"),
+                onPressed: () async {
+                  bool success = await _authService.register(
+                    nameController.text,
+                    emailController.text,
+                    passwordController.text,
+                  );
+                  if (success) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('Registrasi Gagal')));
+                  }
+                },
+                child: Text('Register'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Sudah punya akun? Login'),
               ),
             ],
           ),
